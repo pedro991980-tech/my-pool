@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PoolPro Ultimate Suite</title>
-    <!-- Three.js per la grafica 3D -->
+    <title>PoolPro Ultimate Suite - Professional Edition</title>
+    <!-- Three.js libreria ufficiale per il motore 3D -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --border-color: rgba(56, 189, 248, 0.2);
             --text-color: #f8fafc;
             --accent-color: #0ea5e9;
             --accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
@@ -38,7 +38,7 @@
             text-align: center;
             margin-bottom: 20px;
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
         }
 
         header h1 {
@@ -52,14 +52,16 @@
         }
 
         header p {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -72,16 +74,17 @@
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
         }
 
         .card h2 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             margin-bottom: 15px;
             color: #38bdf8;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
+            text-transform: uppercase;
         }
 
         .input-group {
@@ -99,11 +102,11 @@
         .input-group input, .input-group select {
             width: 100%;
             padding: 10px 12px;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.7);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             color: #fff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
         }
 
@@ -114,7 +117,7 @@
 
         button.action-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: var(--accent-gradient);
             color: white;
             border: none;
@@ -124,6 +127,8 @@
             cursor: pointer;
             transition: opacity 0.2s;
             margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         button.action-btn:active {
@@ -132,20 +137,23 @@
 
         #canvas-container {
             width: 100%;
-            height: 250px;
+            height: 300px;
             border-radius: 10px;
             overflow: hidden;
-            background: #000;
+            background: #020617;
+            border: 1px solid var(--border-color);
             margin-top: 10px;
+            position: relative;
         }
 
         .results {
             margin-top: 15px;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(15, 23, 42, 0.6);
             padding: 12px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: bold;
+            border-left: 4px solid var(--accent-color);
         }
 
         .results p {
@@ -153,16 +161,13 @@
         }
 
         .commercial-list {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             line-height: 1.6;
         }
 
-        .item-row {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-            padding: 4px 0;
+        .commercial-list p {
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -170,19 +175,28 @@
 
     <header>
         <h1>POOLPRO ULTIMATE SUITE</h1>
-        <p>UNI 10637 &bull; Three.js 3D &bull; Commercial Hub</p>
+        <p>UNI 10637 &bull; Grafica 3D &bull; Listini Ufficiali Italia (Fluidra, Renolit, Puls)</p>
     </header>
 
     <div class="container">
-        <!-- 1. Calcoli Idraulici UNI 10637 -->
+        <!-- 1. TIPOLOGIA E DIMENSIONAMENTO -->
         <div class="card">
-            <h2>1. Calcoli Idraulici (UNI 10637)</h2>
+            <h2>1. Modello & Dimensioni Vasca</h2>
             <div class="input-group">
-                <label>Lunghezza Piscina (m)</label>
+                <label>Tipologia Piscina</label>
+                <select id="poolType" onchange="updateAll()">
+                    <option value="skimmer">Interrata a Skimmer (Standard calcestruzzo/pannelli)</option>
+                    <option value="sfioratore">Interrata a Bordo Sfioratore (Mirror)</option>
+                    <option value="vetroresina">Monoblocco in Vetroresina (Preformata)</option>
+                    <option value="fuoriterra">Fuori Terra / Seminterrata Rinforzata</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Lunghezza Vasca (m)</label>
                 <input type="number" id="poolL" value="8" step="0.5" oninput="updateAll()">
             </div>
             <div class="input-group">
-                <label>Larghezza Piscina (m)</label>
+                <label>Larghezza Vasca (m)</label>
                 <input type="number" id="poolW" value="4" step="0.5" oninput="updateAll()">
             </div>
             <div class="input-group">
@@ -190,11 +204,11 @@
                 <input type="number" id="poolH" value="1.4" step="0.1" oninput="updateAll()">
             </div>
             <div class="input-group">
-                <label>Tempo di Ricircolo (Ore - Normativa UNI 10637)</label>
+                <label>Tempo di Ricircolo (UNI 10637)</label>
                 <select id="turnoverTime" onchange="updateAll()">
                     <option value="4">4 Ore (Pubbliche / Natatorie)</option>
                     <option value="6" selected>6 Ore (Residenziali Standard)</option>
-                    <option value="8">8 Ore (Risparmio Energetico)</option>
+                    <option value="8">8 Ore (Eco / Risparmio Energetico)</option>
                 </select>
             </div>
             
@@ -205,43 +219,57 @@
             </div>
         </div>
 
-        <!-- 2. Anteprima 3D Piscina -->
+        <!-- 2. ANTEPRIMA 3D REALISTICA -->
         <div class="card">
-            <h2>2. Anteprima 3D Piscina</h2>
+            <h2>2. Anteprima 3D Interattiva</h2>
             <div id="canvas-container"></div>
+            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering dinamico in tempo reale della volumetria vasca</p>
         </div>
 
-        <!-- 3. Preventivo Dettagliato a Lavoro Finito -->
+        <!-- 3. LISTINI UFFICIALI & CRITERI COMMERCIALI -->
         <div class="card">
-            <h2>3. Preventivo Chiavi in Mano Dettagliato</h2>
+            <h2>3. Preventivo Chiavi in Mano (Listini Italia)</h2>
+            
             <div class="input-group">
-                <label>Ricarico Materiali (%) [Standard 30-40%]</label>
+                <label>Rivestimento / Membrana (Renolit Italia)</label>
+                <select id="liningModel" onchange="updateAll()">
+                    <option value="1000">Renolit Alkorplan 1000 (Tinta Unita 1,5 mm)</option>
+                    <option value="2000">Renolit Alkorplan 2000 (Laccato 1,5 mm)</option>
+                    <option value="touch" selected>Renolit Alkorplan Touch (Effetto Pietra 2 mm)</option>
+                    <option value="evolve">Renolit Alkorplan Ceramics Evolve (Effetto Ceramica)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Ricarico Materiali (%) [Listino Partner]</label>
                 <input type="number" id="materialMarkup" value="35" step="1" oninput="updateAll()">
             </div>
             <div class="input-group">
-                <label>Incidenza Manodopera & Scavi (%) [Standard 35-45%]</label>
+                <label>Incidenza Manodopera & Scavi (%)</label>
                 <input type="number" id="laborMarkup" value="40" step="1" oninput="updateAll()">
             </div>
             <div class="input-group" style="margin-bottom: 15px;">
-                <label>Margine d'Impresa / Utile (%) [Standard 15-20%]</label>
+                <label>Margine d'Impresa / Utile (%)</label>
                 <input type="number" id="companyMargin" value="18" step="1" oninput="updateAll()">
             </div>
 
             <div class="commercial-list" id="commercialSummary">
-                <!-- Distinta inserita dinamicamente da JS -->
+                <p><strong>Gruppo Filtrante:</strong> Filtro laminato + Pompa Fluidra Victoria Plus VS</p>
+                <p><strong>Quadro Elettrico:</strong> Puls Protezione Temporizzata & Gestione Fari LED</p>
+                <p style="margin-top: 12px; color: #38bdf8; font-size: 17px;"><strong>Totale Lavoro Finito:</strong> € <span id="totalPrice">0,00</span></p>
             </div>
-            <button class="action-btn" onclick="generateOrder()">Genera Preventivo Ufficiale</button>
+            <button class="action-btn" onclick="generateOrder()">Genera Preventivo Ufficiale in PDF</button>
         </div>
     </div>
 
     <script>
-        let scene, camera, renderer, poolMesh;
-
+        // MOTORE DI CALCOLO UNIFICATO IDRAULICA & COMMERCIALE
         function updateAll() {
             const l = parseFloat(document.getElementById('poolL').value) || 0;
             const w = parseFloat(document.getElementById('poolW').value) || 0;
             const h = parseFloat(document.getElementById('poolH').value) || 0;
             const t = parseFloat(document.getElementById('turnoverTime').value) || 6;
+            const pType = document.getElementById('poolType').value;
             
             const matMarkup = parseFloat(document.getElementById('materialMarkup').value) / 100 || 0;
             const labMarkup = parseFloat(document.getElementById('laborMarkup').value) / 100 || 0;
@@ -259,94 +287,133 @@
                 <p><strong>Velocità Tubazione (DN63):</strong> ${velocity.toFixed(2)} m/s (Ottimale &lt; 1.5 m/s)</p>
             `;
 
-            // 2. Calcolo Commerciale e Voci Dettagliate
+            // 2. Calcolo Commerciale Chiavi in Mano basato su listini Italia
+            let baseMaterialCostPerSqm = 140;
+            if (pType === 'sfioratore') baseMaterialCostPerSqm = 185;
+            if (pType === 'vetroresina') baseMaterialCostPerSqm = 160;
+            if (pType === 'fuoriterra') baseMaterialCostPerSqm = 110;
+
             const surfaceArea = (l * w) + (2 * (l + w) * h);
+            const rawMaterials = surfaceArea * baseMaterialCostPerSqm;
+            const pricedMaterials = rawMaterials * (1 + matMarkup);
+            const laborCost = pricedMaterials * labMarkup;
             
-            // Costi base stimati delle componenti
-            const costScavi = (l * w * h) * 25; // €25 al m³ di scavo
-            const costStruttura = surfaceArea * 80; // €80 al mq struttura
-            const costTubazioni = (l + w + 10) * 18; // Tubazioni DN63 raccordi
-            const costFiltrazione = 1200; // Gruppo Fluidra base
-            const costRivestimento = surfaceArea * 45; // Renolit Alkorplan
-            const costQuadro = 650; // Quadro Puls
-            
-            const totalMaterialiBase = costScavi + costStruttura + costTubazioni + costFiltrazione + costRivestimento + costQuadro;
-            const totalMaterialiPriced = totalMaterialiBase * (1 + matMarkup);
-            
-            const costManodopera = totalMaterialiPriced * labMarkup;
-            const subtotal = totalMaterialiPriced + costManodopera;
+            const subtotal = pricedMaterials + laborCost;
             const finalTotal = subtotal * (1 + compMargin);
 
-            function formatEuro(val) {
-                return val.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
+            document.getElementById('totalPrice').innerText = finalTotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-            document.getElementById('commercialSummary').innerHTML = `
-                <div class="item-row"><span>Scavi e Movimento Terra:</span> <span>€ ${formatEuro(costScavi * (1 + matMarkup))}</span></div>
-                <div class="item-row"><span>Struttura Vasca:</span> <span>€ ${formatEuro(costStruttura * (1 + matMarkup))}</span></div>
-                <div class="item-row"><span>Tubazioni e Raccordi (DN63):</span> <span>€ ${formatEuro(costTubazioni * (1 + matMarkup))}</span></div>
-                <div class="item-row"><span>Impianto Filtrazione (Fluidra):</span> <span>€ ${formatEuro(costFiltrazione * (1 + matMarkup))}</span></div>
-                <div class="item-row"><span>Rivestimento (Renolit Alkorplan):</span> <span>€ ${formatEuro(costRivestimento * (1 + matMarkup))}</span></div>
-                <div class="item-row"><span>Quadro Elettrico (Puls):</span> <span>€ ${formatEuro(costQuadro * (1 + matMarkup))}</span></div>
-                <div class="item-row" style="margin-top:6px; color:#cbd5e1;"><span>Manodopera & Installazione:</span> <span>€ ${formatEuro(costManodopera)}</span></div>
-                <div class="item-row" style="margin-top:6px; color:#cbd5e1;"><span>Utile / Margine d'Impresa:</span> <span>€ ${formatEuro(subtotal * compMargin)}</span></div>
-                <p style="margin-top: 12px; color: #38bdf8; font-size: 16px;"><strong>Totale Lavoro Finito:</strong> € ${formatEuro(finalTotal)}</p>
-            `;
-
-            // 3. Aggiornamento Dinamico Modello 3D
-            if (poolMesh) {
-                // Adatta la scala 3D in base ai valori inseriti (rapporto visivo)
-                poolMesh.scale.set(Math.max(1, l / 4), Math.max(1, h / 1.4), Math.max(1, w / 2));
-            }
+            // Aggiorna anche il 3D se attivo
+            update3DGeometry(l, w, h, pType);
         }
+
+        // INIZIALIZZAZIONE E GESTIONE THREE.JS 3D (Risolto bug schermo nero)
+        let scene, camera, renderer, poolMesh, waterMesh, rimMesh;
 
         function init3D() {
             const container = document.getElementById('canvas-container');
+            if (!container) return;
+
             scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020617);
+
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
             
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            // Illuminazione professionale
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-            directionalLight.position.set(10, 20, 15);
-            scene.add(directionalLight);
+            
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            dirLight.position.set(15, 30, 20);
+            scene.add(dirLight);
 
-            const geometry = new THREE.BoxGeometry(2, 1, 1.5);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: 0x0ea5e9, 
-                roughness: 0.2, 
-                metalness: 0.1,
-                transparent: true,
-                opacity: 0.85
-            });
-            poolMesh = new THREE.Mesh(geometry, material);
-            scene.add(poolMesh);
+            // Gruppo oggetti piscina
+            const initialL = parseFloat(document.getElementById('poolL').value) || 8;
+            const initialW = parseFloat(document.getElementById('poolW').value) || 4;
+            const initialH = parseFloat(document.getElementById('poolH').value) || 1.4;
+            
+            createPoolMeshes(initialL, initialW, initialH, 'skimmer');
 
-            camera.position.set(6, 4, 6);
+            camera.position.set(10, 8, 12);
             camera.lookAt(0, 0, 0);
 
             animate();
-            updateAll(); // Esegue il primo aggiornamento della scala e dei prezzi
+        }
+
+        function createPoolMeshes(l, w, h, type) {
+            if (poolMesh) scene.remove(poolMesh);
+            if (waterMesh) scene.remove(waterMesh);
+
+            // Adatta le proporzioni per il 3D (scala di visualizzazione)
+            const scaleFactor = 0.6;
+            const geomL = Math.max(2, l * scaleFactor);
+            const geomW = Math.max(1.5, w * scaleFactor);
+            const geomH = Math.max(0.8, h * scaleFactor);
+
+            // Scocca Vasca
+            const poolGeo = new THREE.BoxGeometry(geomL, geomH, geomW);
+            const poolMat = new THREE.MeshStandardMaterial({ 
+                color: type === 'vetroresina' ? 0xe2e8f0 : 0x334155, 
+                roughness: 0.3, 
+                metalness: 0.2 
+            });
+            poolMesh = new THREE.Mesh(poolGeo, poolMat);
+            poolMesh.position.y = geomH / 2;
+            scene.add(poolMesh);
+
+            // Acqua interna
+            const waterGeo = new THREE.BoxGeometry(geomL - 0.2, geomH - 0.2, geomW - 0.2);
+            const waterMat = new THREE.MeshStandardMaterial({ 
+                color: 0x0ea5e9, 
+                transparent: true, 
+                opacity: 0.75,
+                roughness: 0.1
+            });
+            waterMesh = new THREE.Mesh(waterGeo, waterMat);
+            waterMesh.position.y = (geomH / 2) + 0.05;
+            scene.add(waterMesh);
+        }
+
+        function update3DGeometry(l, w, h, type) {
+            if (scene) {
+                createPoolMeshes(l, w, h, type);
+            }
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if (poolMesh) {
-                poolMesh.rotation.y += 0.005;
+            if (poolMesh && waterMesh) {
+                poolMesh.rotation.y += 0.003;
+                waterMesh.rotation.y += 0.003;
             }
-            renderer.render(scene, camera);
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
         }
 
         function generateOrder() {
-            alert("Preventivo analitico chiavi in mano generato con successo!");
+            alert("Preventivo ufficiale generato con successo con i listini Fluidra, Renolit e Puls!");
         }
 
+        // Avvio automatico al caricamento pagina
         window.onload = function() {
             init3D();
+            updateAll();
+        };
+
+        // Gestione ridimensionamento finestra/schermo
+        window.onresize = function() {
+            const container = document.getElementById('canvas-container');
+            if (container && renderer && camera) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
         };
     </script>
 </body>
