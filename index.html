@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PoolPro Ultimate Suite - Professional Edition</title>
-    <!-- Three.js libreria ufficiale per il motore 3D -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js libreria ufficiale con controllo di caricamento -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="handleThreeJsError()"></script>
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -144,6 +144,17 @@
             border: 1px solid var(--border-color);
             margin-top: 10px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .webgl-error {
+            color: #f87171;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            font-weight: bold;
         }
 
         .results {
@@ -175,7 +186,7 @@
 
     <header>
         <h1>POOLPRO ULTIMATE SUITE</h1>
-        <p>UNI 10637 &bull; Grafica 3D &bull; Listini Ufficiali Italia (Fluidra, Renolit, Puls)</p>
+        <p>UNI 10637 &bull; Grafica 3D Avanzata &bull; Listini Ufficiali Italia</p>
     </header>
 
     <div class="container">
@@ -219,16 +230,18 @@
             </div>
         </div>
 
-        <!-- 2. ANTEPRIMA 3D REALISTICA -->
+        <!-- 2. ANTEPRIMA 3D CON GESTIONE FALLBACK -->
         <div class="card">
-            <h2>2. Anteprima 3D Interattiva</h2>
-            <div id="canvas-container"></div>
-            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering dinamico in tempo reale della volumetria vasca</p>
+            <h2>2. Anteprima 3D Dettagliata (Skimmer & Cordoli)</h2>
+            <div id="canvas-container">
+                <div id="loading-3d" style="color: #38bdf8; font-weight: bold;">Caricamento motore 3D in corso...</div>
+            </div>
+            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con bordi perimetrali e accessori tecnici</p>
         </div>
 
         <!-- 3. LISTINI UFFICIALI & CRITERI COMMERCIALI -->
         <div class="card">
-            <h2>3. Preventivo Chiavi in Mano (Listini Italia)</h2>
+            <h2>3. Preventivo Chiavi in Mano (Fluidra, Renolit, Puls)</h2>
             
             <div class="input-group">
                 <label>Rivestimento / Membrana (Renolit Italia)</label>
@@ -263,6 +276,14 @@
     </div>
 
     <script>
+        // Gestione errore caricamento script CDN Three.js
+        function handleThreeJsError() {
+            const container = document.getElementById('canvas-container');
+            if (container) {
+                container.innerHTML = '<div class="webgl-error">Impossibile caricare la libreria 3D (Three.js). Verifica la connessione a Internet.</div>';
+            }
+        }
+
         // MOTORE DI CALCOLO UNIFICATO IDRAULICA & COMMERCIALE
         function updateAll() {
             const l = parseFloat(document.getElementById('poolL').value) || 0;
@@ -303,28 +324,46 @@
 
             document.getElementById('totalPrice').innerText = finalTotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-            // Aggiorna anche il 3D se attivo
+            // Aggiorna il 3D
             update3DGeometry(l, w, h, pType);
         }
 
-        // INIZIALIZZAZIONE E GESTIONE THREE.JS 3D (Risolto bug schermo nero)
-        let scene, camera, renderer, poolMesh, waterMesh, rimMesh;
+        // INIZIALIZZAZIONE E GESTIONE THREE.JS CON FALLBACK WEBGL
+        let scene, camera, renderer, poolGroup;
 
         function init3D() {
             const container = document.getElementById('canvas-container');
             if (!container) return;
+
+            // Controllo supporto WebGL
+            try {
+                const canvasTest = document.createElement('canvas');
+                if (!window.WebGLRenderingContext || (!canvasTest.getContext('webgl') && !canvasTest.getContext('experimental-webgl'))) {
+                    throw new Error('WebGL non supportato dal browser.');
+                }
+            } catch (e) {
+                container.innerHTML = '<div class="webgl-error">Il tuo browser o dispositivo non supporta l\'accelerazione WebGL per la grafica 3D.</div>';
+                return;
+            }
+
+            container.innerHTML = ''; // Pulisci messaggio di caricamento
 
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x020617);
 
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
             
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
+            try {
+                renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                container.appendChild(renderer.domElement);
+            } catch (err) {
+                container.innerHTML = '<div class="webgl-error">Errore di avvio del motore grafico 3D.</div>';
+                return;
+            }
 
-            // Illuminazione professionale
+            // Illuminazione
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
             
@@ -332,64 +371,82 @@
             dirLight.position.set(15, 30, 20);
             scene.add(dirLight);
 
-            // Gruppo oggetti piscina
+            poolGroup = new THREE.Group();
+            scene.add(poolGroup);
+
             const initialL = parseFloat(document.getElementById('poolL').value) || 8;
             const initialW = parseFloat(document.getElementById('poolW').value) || 4;
             const initialH = parseFloat(document.getElementById('poolH').value) || 1.4;
             
             createPoolMeshes(initialL, initialW, initialH, 'skimmer');
 
-            camera.position.set(10, 8, 12);
+            camera.position.set(12, 10, 14);
             camera.lookAt(0, 0, 0);
 
             animate();
         }
 
+        // COSTRUZIONE 3D DETTAGLIATA (Vasca, Acqua, Cordoli e Skimmer)
         function createPoolMeshes(l, w, h, type) {
-            if (poolMesh) scene.remove(poolMesh);
-            if (waterMesh) scene.remove(waterMesh);
+            if (!poolGroup) return;
+            
+            // Rimuovi elementi precedenti dal gruppo
+            while(poolGroup.children.length > 0){ 
+                poolGroup.remove(poolGroup.children[0]); 
+            }
 
-            // Adatta le proporzioni per il 3D (scala di visualizzazione)
-            const scaleFactor = 0.6;
+            const scaleFactor = 0.55;
             const geomL = Math.max(2, l * scaleFactor);
             const geomW = Math.max(1.5, w * scaleFactor);
             const geomH = Math.max(0.8, h * scaleFactor);
 
+            // 1. Colore scocca dinamico in base al tipo
+            let poolColor = 0x334155; // default skimmer grigio scuro
+            if (type === 'vetroresina') poolColor = 0xe2e8f0; // bianco/azzurro chiaro
+            if (type === 'fuoriterra') poolColor = 0xb45309; // effetto legno/struttura esterna
+
             // Scocca Vasca
             const poolGeo = new THREE.BoxGeometry(geomL, geomH, geomW);
-            const poolMat = new THREE.MeshStandardMaterial({ 
-                color: type === 'vetroresina' ? 0xe2e8f0 : 0x334155, 
-                roughness: 0.3, 
-                metalness: 0.2 
-            });
-            poolMesh = new THREE.Mesh(poolGeo, poolMat);
+            const poolMat = new THREE.MeshStandardMaterial({ color: poolColor, roughness: 0.4, metalness: 0.1 });
+            const poolMesh = new THREE.Mesh(poolGeo, poolMat);
             poolMesh.position.y = geomH / 2;
-            scene.add(poolMesh);
+            poolGroup.add(poolMesh);
 
-            // Acqua interna
-            const waterGeo = new THREE.BoxGeometry(geomL - 0.2, geomH - 0.2, geomW - 0.2);
-            const waterMat = new THREE.MeshStandardMaterial({ 
-                color: 0x0ea5e9, 
-                transparent: true, 
-                opacity: 0.75,
-                roughness: 0.1
-            });
-            waterMesh = new THREE.Mesh(waterGeo, waterMat);
-            waterMesh.position.y = (geomH / 2) + 0.05;
-            scene.add(waterMesh);
+            // 2. Acqua interna
+            const waterGeo = new THREE.BoxGeometry(geomL - 0.2, geomH - 0.25, geomW - 0.2);
+            const waterMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.8, roughness: 0.1 });
+            const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+            waterMesh.position.y = (geomH / 2) + 0.02;
+            poolGroup.add(waterMesh);
+
+            // 3. Cordolo / Bordo perimetrale
+            const copingGeo = new THREE.BoxGeometry(geomL + 0.3, 0.1, geomW + 0.3);
+            const copingMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2 }); // pietra bianca bordo piscina
+            const copingMesh = new THREE.Mesh(copingGeo, copingMat);
+            copingMesh.position.y = geomH + 0.05;
+            poolGroup.add(copingMesh);
+
+            // 4. Skimmer visibili (piccoli blocchi bianchi sui lati corti)
+            if (type !== 'sfioratore') {
+                const skimmerGeo = new THREE.BoxGeometry(0.3, 0.15, 0.1);
+                const skimmerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                
+                const skimmer1 = new THREE.Mesh(skimmerGeo, skimmerMat);
+                skimmer1.position.set(0, geomH - 0.1, (geomW / 2) + 0.12);
+                poolGroup.add(skimmer1);
+            }
         }
 
         function update3DGeometry(l, w, h, type) {
-            if (scene) {
+            if (scene && poolGroup) {
                 createPoolMeshes(l, w, h, type);
             }
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if (poolMesh && waterMesh) {
-                poolMesh.rotation.y += 0.003;
-                waterMesh.rotation.y += 0.003;
+            if (poolGroup) {
+                poolGroup.rotation.y += 0.002;
             }
             if (renderer && scene && camera) {
                 renderer.render(scene, camera);
@@ -397,16 +454,23 @@
         }
 
         function generateOrder() {
-            alert("Preventivo ufficiale generato con successo con i listini Fluidra, Renolit e Puls!");
+            alert("Preventivo ufficiale generato con successo includendo i listini Fluidra, Renolit e Puls!");
         }
 
-        // Avvio automatico al caricamento pagina
+        // Avvio al caricamento della pagina
         window.onload = function() {
-            init3D();
-            updateAll();
+            // Piccolo timeout per consentire il pieno caricamento della CDN Three.js
+            setTimeout(() => {
+                if (typeof THREE !== 'undefined') {
+                    init3D();
+                    updateAll();
+                } else {
+                    handleThreeJsError();
+                }
+            }, 300);
         };
 
-        // Gestione ridimensionamento finestra/schermo
+        // Ridimensionamento finestra
         window.onresize = function() {
             const container = document.getElementById('canvas-container');
             if (container && renderer && camera) {
