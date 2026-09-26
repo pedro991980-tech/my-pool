@@ -191,12 +191,18 @@
             margin-top: 15px;
             background: rgba(14, 165, 233, 0.15);
             border: 1px solid var(--accent-color);
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            text-align: right;
-            font-size: 17px;
+            font-size: 15px;
             font-weight: bold;
+            color: #f8fafc;
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        .total-box span {
             color: #38bdf8;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -204,7 +210,7 @@
 
     <header>
         <h1>POOLPRO ULTIMATE SUITE</h1>
-        <p>UNI 10637 &bull; Grafica 3D &bull; Cataloghi Ufficiali & Accessori Extra</p>
+        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo con IVA Inclusa</p>
     </header>
 
     <div class="container">
@@ -267,9 +273,9 @@
             <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con viewport forzato</p>
         </div>
 
-        <!-- 3. PREVENTIVO, SOLARIOM, ACCESSORI EXTRA E DISTINTA BASE -->
+        <!-- 3. PREVENTIVO, IVA E DISTINTA BASE -->
         <div class="card">
-            <h2>3. Preventivo & Distinta Base (Fluidra, Renolit, Puls)</h2>
+            <h2>3. Preventivo, IVA & Distinta Base</h2>
             
             <div class="input-group">
                 <label>Rivestimento / Membrana (Renolit Italia)</label>
@@ -281,13 +287,11 @@
                 </select>
             </div>
 
-            <!-- Pavimentazione / Solarium modificabile -->
             <div class="input-group">
                 <label>Pavimentazione Perimetrale / Solarium (mq) [Modificabile]</label>
                 <input type="number" id="solariumArea" value="50" step="1" oninput="updateAll()">
             </div>
 
-            <!-- Doccia Solare -->
             <div class="input-group">
                 <label>Doccia Solare da Esterno</label>
                 <select id="solarShower" onchange="updateAll()">
@@ -297,7 +301,6 @@
                 </select>
             </div>
 
-            <!-- NUOVI OPTIONAL: Pompa di Calore & Copertura -->
             <div class="input-group">
                 <label>Pompa di Calore Inverter (Riscaldamento Acqua)</label>
                 <select id="heatPump" onchange="updateAll()">
@@ -324,12 +327,22 @@
                 <label>Incidenza Manodopera & Scavi (%)</label>
                 <input type="number" id="laborMarkup" value="40" step="1" oninput="updateAll()">
             </div>
-            <div class="input-group" style="margin-bottom: 10px;">
+            <div class="input-group">
                 <label>Margine d'Impresa / Utile (%)</label>
                 <input type="number" id="companyMargin" value="18" step="1" oninput="updateAll()">
             </div>
 
-            <!-- Distinta Base in elenco aggiornata -->
+            <!-- SELETTORE IVA -->
+            <div class="input-group" style="margin-bottom: 10px;">
+                <label>Aliquota IVA Applicata</label>
+                <select id="vatRate" onchange="updateAll()">
+                    <option value="0.22" selected>IVA Ordinaria 22%</option>
+                    <option value="0.10">IVA Agevolata 10% (Ristrutturazioni / Prima Casa)</option>
+                    <option value="0.00">Esente / Non Soggetta (0%)</option>
+                </select>
+            </div>
+
+            <!-- Distinta Base in elenco -->
             <div class="bom-container">
                 <p style="color: #38bdf8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Distinta Base Componenti:</p>
                 <ul class="bom-list" id="bomListContainer">
@@ -337,8 +350,10 @@
                 </ul>
             </div>
 
-            <div class="total-box">
-                Totale Lavoro Finito: € <span id="totalPrice">0,00</span>
+            <div class="total-box" id="totalBoxContent">
+                Totale Imponibile: € 0,00<br>
+                IVA: € 0,00<br>
+                <strong>Totale Complessivo IVA Inclusa: <span>€ 0,00</span></strong>
             </div>
 
             <button class="action-btn" onclick="generateOrder()">Genera Preventivo Ufficiale in PDF</button>
@@ -481,7 +496,6 @@
             updateAll();
         }
 
-        // Funzione distinta base in elenco aggiornata con tutti gli optional
         function generateComponentList(l, w, h, flowRate, type, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumCost, showerCost, heatPumpCost, coverCost) {
             const surfaceArea = (l * w) + (2 * (l + w) * h);
             const skimmerCount = l > 10 ? 3 : 2;
@@ -514,7 +528,6 @@
             document.getElementById('bomListContainer').innerHTML = html;
         }
 
-        // MOTORE DI CALCOLO UNIFICATO
         function updateAll() {
             const l = parseFloat(document.getElementById('poolL').value) || 0;
             const w = parseFloat(document.getElementById('poolW').value) || 0;
@@ -525,6 +538,7 @@
             const matMarkup = parseFloat(document.getElementById('materialMarkup').value) / 100 || 0;
             const labMarkup = parseFloat(document.getElementById('laborMarkup').value) / 100 || 0;
             const compMargin = parseFloat(document.getElementById('companyMargin').value) / 100 || 0;
+            const vatPercentage = parseFloat(document.getElementById('vatRate').value) || 0;
 
             const volume = l * w * h;
             const flowRate = volume / t;
@@ -545,26 +559,22 @@
             const surfaceArea = (l * w) + (2 * (l + w) * h);
             const rawMaterials = surfaceArea * baseMaterialCostPerSqm;
             
-            // Solarium
             const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
             const solariumBaseCost = solariumMq * 55;
             const solariumTotalPriced = solariumBaseCost * (1 + matMarkup);
 
-            // Doccia Solare
             const showerType = document.getElementById('solarShower').value;
             let showerBaseCost = 0;
             if (showerType === 'standard') showerBaseCost = 450;
             if (showerType === 'luxury') showerBaseCost = 850;
             const showerTotalPriced = showerBaseCost * (1 + matMarkup);
 
-            // Pompa di Calore
             const hpType = document.getElementById('heatPump').value;
             let hpBaseCost = 0;
             if (hpType === 'inverter_std') hpBaseCost = 1800;
             if (hpType === 'inverter_pro') hpBaseCost = 2800;
             const hpTotalPriced = hpBaseCost * (1 + matMarkup);
 
-            // Copertura
             const coverType = document.getElementById('poolCover').value;
             let coverBaseCost = 0;
             if (coverType === 'bubble') coverBaseCost = 650;
@@ -574,17 +584,25 @@
             const pricedMaterials = (rawMaterials * (1 + matMarkup)) + solariumTotalPriced + showerTotalPriced + hpTotalPriced + coverTotalPriced;
             const laborCost = pricedMaterials * labMarkup;
             const subtotal = pricedMaterials + laborCost;
-            const finalTotal = subtotal * (1 + compMargin);
+            const finalSubtotal = subtotal * (1 + compMargin);
+
+            // Calcolo IVA
+            const vatAmount = finalSubtotal * vatPercentage;
+            const finalTotalWithVat = finalSubtotal + vatAmount;
 
             generateComponentList(l, w, h, flowRate, pType, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumTotalPriced, showerTotalPriced, hpTotalPriced, coverTotalPriced);
 
-            document.getElementById('totalPrice').innerText = finalTotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('totalBoxContent').innerHTML = `
+                Totale Imponibile: € ${finalSubtotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
+                IVA (${(vatPercentage * 100).toFixed(0)}%): € ${vatAmount.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
+                <strong>Totale Complessivo IVA Inclusa: <span>€ ${finalTotalWithVat.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></strong>
+            `;
 
             update3DGeometry(l, w, h, pType);
         }
 
         function generateOrder() {
-            alert("Preventivo ufficiale completo di accessori e distinta base generato con successo!");
+            alert("Preventivo ufficiale completo di IVA e distinta base generato con successo!");
         }
 
         window.onload = function() {
