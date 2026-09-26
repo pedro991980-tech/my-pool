@@ -153,9 +153,16 @@
         }
 
         .commercial-list {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             line-height: 1.6;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding: 4px 0;
         }
     </style>
 </head>
@@ -167,7 +174,7 @@
     </header>
 
     <div class="container">
-        <!-- Sezione Dimensionamento e Idraulica UNI 10637 -->
+        <!-- 1. Calcoli Idraulici UNI 10637 -->
         <div class="card">
             <h2>1. Calcoli Idraulici (UNI 10637)</h2>
             <div class="input-group">
@@ -198,15 +205,15 @@
             </div>
         </div>
 
-        <!-- Sezione Visualizzatore 3D con Three.js -->
+        <!-- 2. Anteprima 3D Piscina -->
         <div class="card">
             <h2>2. Anteprima 3D Piscina</h2>
             <div id="canvas-container"></div>
         </div>
 
-        <!-- Sezione Commerciale / Preventivo a Lavoro Finito -->
+        <!-- 3. Preventivo Dettagliato a Lavoro Finito -->
         <div class="card">
-            <h2>3. Preventivo Chiavi in Mano (Fluidra, Renolit, Puls)</h2>
+            <h2>3. Preventivo Chiavi in Mano Dettagliato</h2>
             <div class="input-group">
                 <label>Ricarico Materiali (%) [Standard 30-40%]</label>
                 <input type="number" id="materialMarkup" value="35" step="1" oninput="updateAll()">
@@ -221,16 +228,15 @@
             </div>
 
             <div class="commercial-list" id="commercialSummary">
-                <p><strong>Rivestimento:</strong> Renolit Alkorplan Touch / 2mm</p>
-                <p><strong>Impianto & Filtrazione:</strong> Fluidra Victoria Plus + Filtro a sabbia</p>
-                <p><strong>Quadro Elettrico:</strong> Puls Protezione Temporizzata</p>
-                <p style="margin-top: 10px; color: #38bdf8; font-size: 16px;"><strong>Totale Lavoro Finito:</strong> € <span id="totalPrice">0,00</span></p>
+                <!-- Distinta inserita dinamicamente da JS -->
             </div>
             <button class="action-btn" onclick="generateOrder()">Genera Preventivo Ufficiale</button>
         </div>
     </div>
 
     <script>
+        let scene, camera, renderer, poolMesh;
+
         function updateAll() {
             const l = parseFloat(document.getElementById('poolL').value) || 0;
             const w = parseFloat(document.getElementById('poolW').value) || 0;
@@ -253,22 +259,46 @@
                 <p><strong>Velocità Tubazione (DN63):</strong> ${velocity.toFixed(2)} m/s (Ottimale &lt; 1.5 m/s)</p>
             `;
 
-            // 2. Calcolo Commerciale a Lavoro Finito
-            const baseMaterialCostPerSqm = 130; // Costo base industriale dei materiali per mq
+            // 2. Calcolo Commerciale e Voci Dettagliate
             const surfaceArea = (l * w) + (2 * (l + w) * h);
             
-            const rawMaterials = surfaceArea * baseMaterialCostPerSqm;
-            const pricedMaterials = rawMaterials * (1 + matMarkup);
-            const laborCost = pricedMaterials * labMarkup;
+            // Costi base stimati delle componenti
+            const costScavi = (l * w * h) * 25; // €25 al m³ di scavo
+            const costStruttura = surfaceArea * 80; // €80 al mq struttura
+            const costTubazioni = (l + w + 10) * 18; // Tubazioni DN63 raccordi
+            const costFiltrazione = 1200; // Gruppo Fluidra base
+            const costRivestimento = surfaceArea * 45; // Renolit Alkorplan
+            const costQuadro = 650; // Quadro Puls
             
-            const subtotal = pricedMaterials + laborCost;
+            const totalMaterialiBase = costScavi + costStruttura + costTubazioni + costFiltrazione + costRivestimento + costQuadro;
+            const totalMaterialiPriced = totalMaterialiBase * (1 + matMarkup);
+            
+            const costManodopera = totalMaterialiPriced * labMarkup;
+            const subtotal = totalMaterialiPriced + costManodopera;
             const finalTotal = subtotal * (1 + compMargin);
 
-            document.getElementById('totalPrice').innerText = finalTotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
+            function formatEuro(val) {
+                return val.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
 
-        // Inizializzazione Three.js 3D
-        let scene, camera, renderer, poolMesh;
+            document.getElementById('commercialSummary').innerHTML = `
+                <div class="item-row"><span>Scavi e Movimento Terra:</span> <span>€ ${formatEuro(costScavi * (1 + matMarkup))}</span></div>
+                <div class="item-row"><span>Struttura Vasca:</span> <span>€ ${formatEuro(costStruttura * (1 + matMarkup))}</span></div>
+                <div class="item-row"><span>Tubazioni e Raccordi (DN63):</span> <span>€ ${formatEuro(costTubazioni * (1 + matMarkup))}</span></div>
+                <div class="item-row"><span>Impianto Filtrazione (Fluidra):</span> <span>€ ${formatEuro(costFiltrazione * (1 + matMarkup))}</span></div>
+                <div class="item-row"><span>Rivestimento (Renolit Alkorplan):</span> <span>€ ${formatEuro(costRivestimento * (1 + matMarkup))}</span></div>
+                <div class="item-row"><span>Quadro Elettrico (Puls):</span> <span>€ ${formatEuro(costQuadro * (1 + matMarkup))}</span></div>
+                <div class="item-row" style="margin-top:6px; color:#cbd5e1;"><span>Manodopera & Installazione:</span> <span>€ ${formatEuro(costManodopera)}</span></div>
+                <div class="item-row" style="margin-top:6px; color:#cbd5e1;"><span>Utile / Margine d'Impresa:</span> <span>€ ${formatEuro(subtotal * compMargin)}</span></div>
+                <p style="margin-top: 12px; color: #38bdf8; font-size: 16px;"><strong>Totale Lavoro Finito:</strong> € ${formatEuro(finalTotal)}</p>
+            `;
+
+            // 3. Aggiornamento Dinamico Modello 3D
+            if (poolMesh) {
+                // Adatta la scala 3D in base ai valori inseriti (rapporto visivo)
+                poolMesh.scale.set(Math.max(1, l / 4), Math.max(1, h / 1.4), Math.max(1, w / 2));
+            }
+        }
 
         function init3D() {
             const container = document.getElementById('canvas-container');
@@ -285,7 +315,7 @@
             directionalLight.position.set(10, 20, 15);
             scene.add(directionalLight);
 
-            const geometry = new THREE.BoxGeometry(4, 1.5, 2);
+            const geometry = new THREE.BoxGeometry(2, 1, 1.5);
             const material = new THREE.MeshStandardMaterial({ 
                 color: 0x0ea5e9, 
                 roughness: 0.2, 
@@ -300,6 +330,7 @@
             camera.lookAt(0, 0, 0);
 
             animate();
+            updateAll(); // Esegue il primo aggiornamento della scala e dei prezzi
         }
 
         function animate() {
@@ -311,11 +342,10 @@
         }
 
         function generateOrder() {
-            alert("Preventivo chiavi in mano generato con successo includendo ricarico materiali, manodopera e margine d'impresa!");
+            alert("Preventivo analitico chiavi in mano generato con successo!");
         }
 
         window.onload = function() {
-            updateAll();
             init3D();
         };
     </script>
