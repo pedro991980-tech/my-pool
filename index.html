@@ -41,6 +41,16 @@
             max-width: 700px;
         }
 
+        .app-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
         header h1 {
             font-size: 24px;
             font-weight: bold;
@@ -209,8 +219,10 @@
 <body>
 
     <header>
+        <!-- Logo visivo ufficiale della piscina -->
+        <img src="logo-piscina.png" alt="PoolPro Logo" class="app-logo" onerror="this.style.display='none'">
         <h1>POOLPRO ULTIMATE SUITE</h1>
-        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo con IVA Inclusa</p>
+        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo con IVA & Distinta Base</p>
     </header>
 
     <div class="container">
@@ -332,7 +344,6 @@
                 <input type="number" id="companyMargin" value="18" step="1" oninput="updateAll()">
             </div>
 
-            <!-- SELETTORE IVA -->
             <div class="input-group" style="margin-bottom: 10px;">
                 <label>Aliquota IVA Applicata</label>
                 <select id="vatRate" onchange="updateAll()">
@@ -586,7 +597,6 @@
             const subtotal = pricedMaterials + laborCost;
             const finalSubtotal = subtotal * (1 + compMargin);
 
-            // Calcolo IVA
             const vatAmount = finalSubtotal * vatPercentage;
             const finalTotalWithVat = finalSubtotal + vatAmount;
 
@@ -602,7 +612,7 @@
         }
 
         function generateOrder() {
-            alert("Preventivo ufficiale completo di IVA e distinta base generato con successo!");
+            alert("Preventivo ufficiale completo di logo, IVA e distinta base generato con successo!");
         }
 
         window.onload = function() {
