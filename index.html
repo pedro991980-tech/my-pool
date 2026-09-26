@@ -135,7 +135,6 @@
             opacity: 0.8;
         }
 
-        /* Fix definitivo per il 3D: dimensioni forzate CSS */
         #canvas-container {
             width: 100%;
             min-height: 300px;
@@ -163,7 +162,6 @@
             margin-bottom: 6px;
         }
 
-        /* Stile lista componenti richiesto */
         .bom-container {
             margin-top: 15px;
             background: rgba(15, 23, 42, 0.8);
@@ -224,11 +222,11 @@
             </div>
             <div class="input-group">
                 <label>Lunghezza Vasca (m)</label>
-                <input type="number" id="poolL" value="8" step="0.5" oninput="updateAll()">
+                <input type="number" id="poolL" value="8" step="0.5" oninput="onDimensionsChange()">
             </div>
             <div class="input-group">
                 <label>Larghezza Vasca (m)</label>
-                <input type="number" id="poolW" value="4" step="0.5" oninput="updateAll()">
+                <input type="number" id="poolW" value="4" step="0.5" oninput="onDimensionsChange()">
             </div>
             <div class="input-group">
                 <label>Profondità Media (m)</label>
@@ -250,14 +248,14 @@
             </div>
         </div>
 
-        <!-- 2. ANTEPRIMA 3D CON FIX DEFINITIVO -->
+        <!-- 2. ANTEPRIMA 3D -->
         <div class="card">
             <h2>2. Anteprima 3D Interattiva</h2>
             <div id="canvas-container"></div>
-            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con viewport forzato e antialias</p>
+            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con viewport forzato</p>
         </div>
 
-        <!-- 3. PREVENTIVO E DISTINTA BASE -->
+        <!-- 3. PREVENTIVO, SOLARIOM, DOCCIA E DISTINTA BASE -->
         <div class="card">
             <h2>3. Preventivo & Distinta Base (Fluidra, Renolit, Puls)</h2>
             
@@ -268,6 +266,22 @@
                     <option value="2000">Renolit Alkorplan 2000 (Laccato 1,5 mm)</option>
                     <option value="touch" selected>Renolit Alkorplan Touch (Effetto Pietra 2 mm)</option>
                     <option value="evolve">Renolit Alkorplan Ceramics Evolve (Effetto Ceramica)</option>
+                </select>
+            </div>
+
+            <!-- Pavimentazione / Solarium modificabile -->
+            <div class="input-group">
+                <label>Pavimentazione Perimetrale / Solarium (mq) [Modificabile]</label>
+                <input type="number" id="solariumArea" value="50" step="1" oninput="updateAll()">
+            </div>
+
+            <!-- Doccia Solare -->
+            <div class="input-group">
+                <label>Doccia Solare da Esterno</label>
+                <select id="solarShower" onchange="updateAll()">
+                    <option value="none">Nessuna Doccia Solare</option>
+                    <option value="standard" selected>Doccia Solare in Alluminio con Miscelatore</option>
+                    <option value="luxury">Doccia Solare di Design Curva con Lava-piedi</option>
                 </select>
             </div>
 
@@ -284,11 +298,11 @@
                 <input type="number" id="companyMargin" value="18" step="1" oninput="updateAll()">
             </div>
 
-            <!-- Sezione Distinta Base con lista in HTML -->
+            <!-- Distinta Base in elenco -->
             <div class="bom-container">
                 <p style="color: #38bdf8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Distinta Base Componenti:</p>
                 <ul class="bom-list" id="bomListContainer">
-                    <!-- Popolato dinamicamente da generateComponentList -->
+                    <!-- Popolato dinamicamente -->
                 </ul>
             </div>
 
@@ -301,10 +315,8 @@
     </div>
 
     <script>
-        // GLOBALI 3D
         let scene, camera, renderer, poolGroup;
 
-        // INIZIALIZZAZIONE 3D CON FIX VIEWPORT ESPLICITO
         function init3D() {
             const container = document.getElementById('canvas-container');
             if (!container) return;
@@ -346,7 +358,6 @@
             animate();
         }
 
-        // COSTRUZIONE 3D
         function createPoolMeshes(l, w, h, type) {
             if (!poolGroup) return;
             
@@ -406,21 +417,32 @@
             }
         }
 
-        // FUNZIONE DEDICATA PER LA DISTINTA BASE IN ELENCO (<ul class="bom-list">)
-        function generateComponentList(l, w, h, flowRate, type, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal) {
+        // Calcola automaticamente i mq del solarium al variare delle dimensioni, se non modificati intenzionalmente
+        function onDimensionsChange() {
+            const l = parseFloat(document.getElementById('poolL').value) || 0;
+            const w = parseFloat(document.getElementById('poolW').value) || 0;
+            // Formula fascia 1.5m intorno: (L + 3) * (W + 3) - (L * W)
+            const autoSolarium = Math.round((l + 3) * (w + 3) - (l * w));
+            document.getElementById('solariumArea').value = autoSolarium;
+            updateAll();
+        }
+
+        // Funzione distinta base in elenco con Solarium e Doccia Solare
+        function generateComponentList(l, w, h, flowRate, type, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumCost, showerCost) {
             const surfaceArea = (l * w) + (2 * (l + w) * h);
             const skimmerCount = l > 10 ? 3 : 2;
             const bQuantity = l > 10 ? 6 : 4;
             const fQuantity = l > 10 ? 3 : 2;
+            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
 
-            const matCostInc = pricedMaterials;
-            
             const html = `
-                <li><span>Movimento Terra & Struttura Armata</span> <span>€ ${(rawMaterials * 0.35 * (1 + (matCostInc/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Rivestimento Membrana (~${surfaceArea.toFixed(0)} m²)</span> <span>€ ${(rawMaterials * 0.18 * (1 + (matCostInc/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Filtrazione (${flowRate.toFixed(1)} m³/h) & Pompa Fluidra</span> <span>€ ${(rawMaterials * 0.20 * (1 + (matCostInc/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Skimmer (${skimmerCount} pz) & Bocchette (${bQuantity} pz)</span> <span>€ ${(rawMaterials * 0.12 * (1 + (matCostInc/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Quadro Elettrico Puls & ${fQuantity} Fari LED</span> <span>€ ${(rawMaterials * 0.15 * (1 + (matCostInc/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Movimento Terra & Struttura Armata</span> <span>€ ${(rawMaterials * 0.35 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Rivestimento Membrana (~${surfaceArea.toFixed(0)} m²)</span> <span>€ ${(rawMaterials * 0.18 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Filtrazione (${flowRate.toFixed(1)} m³/h) & Pompa Fluidra</span> <span>€ ${(rawMaterials * 0.20 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Skimmer (${skimmerCount} pz) & Bocchette (${bQuantity} pz)</span> <span>€ ${(rawMaterials * 0.12 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Quadro Elettrico Puls & ${fQuantity} Fari LED</span> <span>€ ${(rawMaterials * 0.15 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Pavimentazione Solare (${solariumMq} mq)</span> <span>€ ${solariumCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Doccia Solare da Esterno</span> <span>€ ${showerCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
                 <li><span>Manodopera Specializzata & Scavi</span> <span>€ ${laborCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
                 <li><span>Margine d'Impresa / Utile</span> <span>€ ${(subtotal * compMargin).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
             `;
@@ -458,13 +480,25 @@
 
             const surfaceArea = (l * w) + (2 * (l + w) * h);
             const rawMaterials = surfaceArea * baseMaterialCostPerSqm;
-            const pricedMaterials = rawMaterials * (1 + matMarkup);
+            
+            // Calcolo Solarium (costo base al mq circa 55€ + ricarico materiali)
+            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
+            const solariumBaseCost = solariumMq * 55;
+            const solariumTotalPriced = solariumBaseCost * (1 + matMarkup);
+
+            // Calcolo Doccia Solare
+            const showerType = document.getElementById('solarShower').value;
+            let showerBaseCost = 0;
+            if (showerType === 'standard') showerBaseCost = 450;
+            if (showerType === 'luxury') showerBaseCost = 850;
+            const showerTotalPriced = showerBaseCost * (1 + matMarkup);
+
+            const pricedMaterials = (rawMaterials * (1 + matMarkup)) + solariumTotalPriced + showerTotalPriced;
             const laborCost = pricedMaterials * labMarkup;
             const subtotal = pricedMaterials + laborCost;
             const finalTotal = subtotal * (1 + compMargin);
 
-            // Richiamo della funzione distinta base in elenco
-            generateComponentList(l, w, h, flowRate, pType, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal);
+            generateComponentList(l, w, h, flowRate, pType, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumTotalPriced, showerTotalPriced);
 
             document.getElementById('totalPrice').innerText = finalTotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -472,12 +506,12 @@
         }
 
         function generateOrder() {
-            alert("Preventivo e distinta base generati con successo!");
+            alert("Preventivo ufficiale con solarium e doccia solare generato con successo!");
         }
 
         window.onload = function() {
             init3D();
-            updateAll();
+            onDimensionsChange(); // Inizializza solarium e calcoli
         };
 
         window.onresize = function() {
