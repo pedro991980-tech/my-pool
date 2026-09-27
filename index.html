@@ -188,19 +188,42 @@
 
         .bom-list {
             list-style-type: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
         }
 
         .bom-list li {
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
+            align-items: center;
             justify-content: space-between;
+            gap: 10px;
         }
 
         .bom-list li:last-child {
             border-bottom: none;
+        }
+
+        .bom-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .bom-left input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .bom-price-input {
+            width: 110px !important;
+            padding: 6px 8px !important;
+            font-size: 13px !important;
+            text-align: right;
         }
 
         .total-box {
@@ -228,7 +251,7 @@
         <!-- Logo ufficiale della piscina -->
         <img src="logo-piscina.png" alt="PoolPro Logo" class="app-logo" onerror="this.style.display='none'">
         <h1>POOLPRO ULTIMATE SUITE</h1>
-        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo con IVA & Distinta Base</p>
+        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo Modulare & IVA</p>
     </header>
 
     <div class="container">
@@ -291,9 +314,9 @@
             <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con viewport forzato</p>
         </div>
 
-        <!-- 3. PREVENTIVO, IVA E DISTINTA BASE -->
+        <!-- 3. PREVENTIVO MODULARE, IVA E DISTINTA BASE -->
         <div class="card">
-            <h2>3. Preventivo, IVA & Distinta Base</h2>
+            <h2>3. Preventivo Modulare, IVA & Distinta Base</h2>
             
             <div class="input-group">
                 <label>Rivestimento / Membrana (Renolit Italia)</label>
@@ -359,11 +382,11 @@
                 </select>
             </div>
 
-            <!-- Distinta Base in elenco -->
+            <!-- Distinta Base Interattiva e Modulare -->
             <div class="bom-container">
-                <p style="color: #38bdf8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Distinta Base Componenti:</p>
+                <p style="color: #38bdf8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Configuratore Voci Distinta Base (Selezionabili & Modificabili):</p>
                 <ul class="bom-list" id="bomListContainer">
-                    <!-- Popolato dinamicamente -->
+                    <!-- Popolato dinamicamente con checkbox e input prezzo -->
                 </ul>
             </div>
 
@@ -513,36 +536,44 @@
             updateAll();
         }
 
-        function generateComponentList(l, w, h, flowRate, type, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumCost, showerCost, heatPumpCost, coverCost) {
-            const surfaceArea = (l * w) + (2 * (l + w) * h);
-            const skimmerCount = l > 10 ? 3 : 2;
-            const bQuantity = l > 10 ? 6 : 4;
-            const fQuantity = l > 10 ? 3 : 2;
-            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
+        // Mappa globale per memorizzare lo stato dei checkbox e dei prezzi personalizzati
+        let bomCustomItems = {};
 
-            let html = `
-                <li><span>Movimento Terra & Struttura Armata</span> <span>€ ${(rawMaterials * 0.35 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Rivestimento Membrana (~${surfaceArea.toFixed(0)} m²)</span> <span>€ ${(rawMaterials * 0.18 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Filtrazione (${flowRate.toFixed(1)} m³/h) & Pompa Fluidra</span> <span>€ ${(rawMaterials * 0.20 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Skimmer (${skimmerCount} pz) & Bocchette (${bQuantity} pz)</span> <span>€ ${(rawMaterials * 0.12 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Quadro Elettrico Puls & ${fQuantity} Fari LED</span> <span>€ ${(rawMaterials * 0.15 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Pavimentazione Solare (${solariumMq} mq)</span> <span>€ ${solariumCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Doccia Solare da Esterno</span> <span>€ ${showerCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-            `;
+        function renderBOMList(items) {
+            const container = document.getElementById('bomListContainer');
+            let html = '';
 
-            if (heatPumpCost > 0) {
-                html += `<li><span>Pompa di Calore Inverter</span> <span>€ ${heatPumpCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>`;
-            }
-            if (coverCost > 0) {
-                html += `<li><span>Copertura Piscina</span> <span>€ ${coverCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>`;
-            }
+            items.forEach((item, index) => {
+                if (bomCustomItems[index] === undefined) {
+                    bomCustomItems[index] = { checked: true, price: item.price };
+                }
+                const currentObj = bomCustomItems[index];
 
-            html += `
-                <li><span>Manodopera Specializzata & Scavi</span> <span>€ ${laborCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Margine d'Impresa / Utile</span> <span>€ ${(subtotal * compMargin).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-            `;
-            
-            document.getElementById('bomListContainer').innerHTML = html;
+                html += `
+                    <li>
+                        <div class="bom-left">
+                            <input type="checkbox" id="bom_chk_${index}" ${currentObj.checked ? 'checked' : ''} onchange="toggleBOMItem(${index})">
+                            <label for="bom_chk_${index}" style="margin:0; cursor:pointer; font-size:13px; color:#f8fafc;">${item.name}</label>
+                        </div>
+                        <div>
+                            <input type="number" step="1" class="bom-price-input" id="bom_prc_${index}" value="${currentObj.price.toFixed(0)}" oninput="updateBOMPrice(${index}, this.value)" ${!currentObj.checked ? 'disabled style="opacity:0.4"' : ''}>
+                        </div>
+                    </li>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleBOMItem(index) {
+            const chk = document.getElementById(`bom_chk_${index}`);
+            bomCustomItems[index].checked = chk.checked;
+            updateAll();
+        }
+
+        function updateBOMPrice(index, val) {
+            bomCustomItems[index].price = parseFloat(val) || 0;
+            updateAll();
         }
 
         function updateAll() {
@@ -598,27 +629,87 @@
             if (coverType === 'automatic') coverBaseCost = 4500;
             const coverTotalPriced = coverBaseCost * (1 + matMarkup);
 
-            const pricedMaterials = (rawMaterials * (1 + matMarkup)) + solariumTotalPriced + showerTotalPriced + hpTotalPriced + coverTotalPriced;
-            const laborCost = pricedMaterials * labMarkup;
-            const subtotal = pricedMaterials + laborCost;
-            const finalSubtotal = subtotal * (1 + compMargin);
+            const skimmerCount = l > 10 ? 3 : 2;
+            const bQuantity = l > 10 ? 6 : 4;
+            const fQuantity = l > 10 ? 3 : 2;
 
+            // Costi base calcolati per ciascuna voce della distinta base
+            const itemStruct = rawMaterials * 0.35 * (1 + matMarkup);
+            const itemLining = rawMaterials * 0.18 * (1 + matMarkup);
+            const itemFilter = rawMaterials * 0.20 * (1 + matMarkup);
+            const itemSkimmer = rawMaterials * 0.12 * (1 + matMarkup);
+            const itemElectric = rawMaterials * 0.15 * (1 + matMarkup);
+
+            let rawItemsList = [
+                { name: "Movimento Terra & Struttura Armata", price: itemStruct },
+                { name: `Rivestimento Membrana (~${surfaceArea.toFixed(0)} m²)`, price: itemLining },
+                { name: `Filtrazione (${flowRate.toFixed(1)} m³/h) & Pompa`, price: itemFilter },
+                { name: `Skimmer (${skimmerCount} pz) & Bocchette (${bQuantity} pz)`, price: itemSkimmer },
+                { name: `Quadro Elettrico & ${fQuantity} Fari LED`, price: itemElectric },
+                { name: `Pavimentazione Solare (${solariumMq} mq)`, price: solariumTotalPriced },
+                { name: `Doccia Solare da Esterno`, price: showerTotalPriced }
+            ];
+
+            if (hpTotalPriced > 0) {
+                rawItemsList.push({ name: "Pompa di Calore Inverter", price: hpTotalPriced });
+            }
+            if (coverTotalPriced > 0) {
+                rawItemsList.push({ name: "Copertura Piscina", price: coverTotalPriced });
+            }
+
+            // Calcolo preliminare dei materiali attivi spuntati
+            let activeMaterialsTotal = 0;
+            rawItemsList.forEach((it, idx) => {
+                if (bomCustomItems[idx] === undefined) {
+                    bomCustomItems[idx] = { checked: true, price: it.price };
+                }
+                if (bomCustomItems[idx].checked) {
+                    activeMaterialsTotal += bomCustomItems[idx].price;
+                }
+            });
+
+            const laborCost = activeMaterialsTotal * labMarkup;
+            const subtotal = activeMaterialsTotal + laborCost;
+            const companyUtile = subtotal * compMargin;
+            
+            const finalSubtotal = subtotal + companyUtile;
             const vatAmount = finalSubtotal * vatPercentage;
             const finalTotalWithVat = finalSubtotal + vatAmount;
 
-            generateComponentList(l, w, h, flowRate, pType, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumTotalPriced, showerTotalPriced, hpTotalPriced, coverTotalPriced);
+            // Aggiungiamo Manodopera e Utile in fondo alla lista interattiva per visualizzarli e modificarli se necessario
+            const laborIdx = rawItemsList.length;
+            const marginIdx = laborIdx + 1;
+
+            if (bomCustomItems[laborIdx] === undefined) bomCustomItems[laborIdx] = { checked: true, price: laborCost };
+            if (bomCustomItems[marginIdx] === undefined) bomCustomItems[marginIdx] = { checked: true, price: companyUtile };
+
+            // Se l'utente non sta modificando direttamente il prezzo di manodopera/utile tramite input, aggiorniamo il valore basato sul ricalcolo, altrimenti manteniamo il valore personalizzato inserito dall'utente
+            // Per semplicità di sincronizzazione reattiva:
+            let activeLabor = bomCustomItems[laborIdx].checked ? bomCustomItems[laborIdx].price : 0;
+            let activeMargin = bomCustomItems[marginIdx].checked ? bomCustomItems[marginIdx].price : 0;
+
+            const calculatedSubtotalActive = activeMaterialsTotal + activeLabor + activeMargin;
+            const calculatedVat = calculatedSubtotalActive * vatPercentage;
+            const calculatedTotalWithVat = calculatedSubtotalActive + calculatedVat;
+
+            // Renderizziamo la lista completa sul DOM
+            let renderList = [...rawItemsList];
+            renderList.push({ name: "Manodopera Specializzata & Scavi", price: bomCustomItems[laborIdx].price });
+            renderList.push({ name: "Margine d'Impresa / Utile", price: bomCustomItems[marginIdx].price });
+
+            renderBOMList(renderList);
 
             document.getElementById('totalBoxContent').innerHTML = `
-                Totale Imponibile: € ${finalSubtotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
-                IVA (${(vatPercentage * 100).toFixed(0)}%): € ${vatAmount.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
-                <strong>Totale Complessivo IVA Inclusa: <span>€ ${finalTotalWithVat.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></strong>
+                Totale Imponibile: € ${calculatedSubtotalActive.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
+                IVA (${(vatPercentage * 100).toFixed(0)}%): € ${calculatedVat.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
+                <strong>Totale Complessivo IVA Inclusa: <span>€ ${calculatedTotalWithVat.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></strong>
             `;
 
             update3DGeometry(l, w, h, pType);
         }
 
         function generateOrder() {
-            alert("Preventivo ufficiale completo di logo, IVA e distinta base generato con successo!");
+            alert("Preventivo sartoriale modulare generato con successo!");
         }
 
         window.onload = function() {
