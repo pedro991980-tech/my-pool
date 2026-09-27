@@ -1,639 +1,641 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PoolPro Ultimate Suite - Professional Edition</title>
-    <!-- Favicon e Icona per schermata Home iOS -->
-    <link rel="icon" type="image/png" href="logo-piscina.png">
-    <link rel="apple-touch-icon" href="logo-piscina.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PoolPro Ultimate Suite - Professional Edition</title>
+    <!-- Favicon e Icona per schermata Home iOS -->
+    <link rel="icon" type="image/png" href="logo-piscina.png">
+    <link rel="apple-touch-icon" href="logo-piscina.png">
 
-    <!-- Three.js libreria ufficiale -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(30, 41, 59, 0.85);
-            --border-color: rgba(56, 189, 248, 0.25);
-            --text-color: #f8fafc;
-            --accent-color: #0ea5e9;
-            --accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-            --font-family: "Times New Roman", Times, serif;
-        }
+    <!-- Three.js libreria ufficiale -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --border-color: rgba(56, 189, 248, 0.25);
+            --text-color: #f8fafc;
+            --accent-color: #0ea5e9;
+            --accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            --font-family: "Times New Roman", Times, serif;
+        }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-family);
-        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 700px;
-        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 700px;
+        }
 
-        .app-logo {
-            width: 110px;
-            height: 110px;
-            object-fit: cover;
-            border-radius: 16px;
-            margin-bottom: 12px;
-            border: 2px solid var(--border-color);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-        }
+        .app-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+            padding: 5px;
+        }
 
-        header h1 {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-        }
+        header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
 
-        header p {
-            font-size: 13px;
-            font-weight: bold;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        header p {
+            font-size: 13px;
+            font-weight: bold;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        .container {
-            width: 100%;
-            max-width: 700px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+        }
 
-        .card h2 {
-            font-size: 17px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #38bdf8;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
-            text-transform: uppercase;
-        }
+        .card h2 {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #38bdf8;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
 
-        .input-group {
-            margin-bottom: 12px;
-        }
+        .input-group {
+            margin-bottom: 12px;
+        }
 
-        .input-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #cbd5e1;
-        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #cbd5e1;
+        }
 
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 10px 12px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 15px;
-            font-weight: bold;
-        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+        }
 
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
 
-        button.action-btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent-gradient);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            margin-top: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        button.action-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        button.action-btn:active {
-            opacity: 0.8;
-        }
+        button.action-btn:active {
+            opacity: 0.8;
+        }
 
-        #canvas-container {
-            width: 100%;
-            min-height: 300px;
-            height: 300px;
-            display: block;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #020617;
-            border: 1px solid var(--border-color);
-            margin-top: 10px;
-            position: relative;
-        }
+        #canvas-container {
+            width: 100%;
+            min-height: 300px;
+            height: 300px;
+            display: block;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #020617;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+            position: relative;
+        }
 
-        .results {
-            margin-top: 15px;
-            background: rgba(15, 23, 42, 0.7);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            border-left: 4px solid var(--accent-color);
-        }
+        .results {
+            margin-top: 15px;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            border-left: 4px solid var(--accent-color);
+        }
 
-        .results p {
-            margin-bottom: 6px;
-        }
+        .results p {
+            margin-bottom: 6px;
+        }
 
-        .bom-container {
-            margin-top: 15px;
-            background: rgba(15, 23, 42, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-        }
+        .bom-container {
+            margin-top: 15px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
 
-        .bom-list {
-            list-style-type: none;
-            font-size: 14px;
-            font-weight: bold;
-        }
+        .bom-list {
+            list-style-type: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-        .bom-list li {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-        }
+        .bom-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
 
-        .bom-list li:last-child {
-            border-bottom: none;
-        }
+        .bom-list li:last-child {
+            border-bottom: none;
+        }
 
-        .total-box {
-            margin-top: 15px;
-            background: rgba(14, 165, 233, 0.15);
-            border: 1px solid var(--accent-color);
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            color: #f8fafc;
-            line-height: 1.6;
-            text-align: right;
-        }
+        .total-box {
+            margin-top: 15px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid var(--accent-color);
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #f8fafc;
+            line-height: 1.6;
+            text-align: right;
+        }
 
-        .total-box span {
-            color: #38bdf8;
-            font-size: 18px;
-        }
-    </style>
+        .total-box span {
+            color: #38bdf8;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
 
-    <header>
-        <!-- Logo visivo ufficiale della piscina -->
-        <img src="logo-piscina.png" alt="PoolPro Logo" class="app-logo" onerror="this.style.display='none'">
-        <h1>POOLPRO ULTIMATE SUITE</h1>
-        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo con IVA & Distinta Base</p>
-    </header>
+    <header>
+        <!-- Logo ufficiale della piscina -->
+        <img src="logo-piscina.png" alt="PoolPro Logo" class="app-logo" onerror="this.style.display='none'">
+        <h1>POOLPRO ULTIMATE SUITE</h1>
+        <p>UNI 10637 &bull; Grafica 3D &bull; Preventivo con IVA & Distinta Base</p>
+    </header>
 
-    <div class="container">
-        <!-- 1. MODELLI DI CATALOGO & DIMENSIONI -->
-        <div class="card">
-            <h2>1. Selezione Modello & Dimensioni Vasca</h2>
-            
-            <div class="input-group">
-                <label>Modelli da Cataloghi Ufficiali (Fluidra, Vetroresina, Fuoriterra)</label>
-                <select id="catalogModel" onchange="applyCatalogModel()">
-                    <option value="custom">-- Inserimento Personalizzato / Libero --</option>
-                    <option value="fluidra_8x4" selected>Fluidra Skimmer Residential (8 x 4 m)</option>
-                    <option value="liberty_6x3">Vetroresina Monoblocco Liberty (6 x 3 m)</option>
-                    <option value="lagos_5x3">Fuori Terra Pannellato Lagos (5 x 3 m)</option>
-                    <option value="mirror_10x5">Sfioratore Mirror High-End (10 x 5 m)</option>
-                </select>
-            </div>
+    <div class="container">
+        <!-- 1. MODELLI DI CATALOGO & DIMENSIONI -->
+        <div class="card">
+            <h2>1. Selezione Modello & Dimensioni Vasca</h2>
+            
+            <div class="input-group">
+                <label>Modelli da Cataloghi Ufficiali (Fluidra, Vetroresina, Fuoriterra)</label>
+                <select id="catalogModel" onchange="applyCatalogModel()">
+                    <option value="custom">-- Inserimento Personalizzato / Libero --</option>
+                    <option value="fluidra_8x4" selected>Fluidra Skimmer Residential (8 x 4 m)</option>
+                    <option value="liberty_6x3">Vetroresina Monoblocco Liberty (6 x 3 m)</option>
+                    <option value="lagos_5x3">Fuori Terra Pannellato Lagos (5 x 3 m)</option>
+                    <option value="mirror_10x5">Sfioratore Mirror High-End (10 x 5 m)</option>
+                </select>
+            </div>
 
-            <div class="input-group">
-                <label>Tipologia Piscina</label>
-                <select id="poolType" onchange="onManualChange()">
-                    <option value="skimmer">Interrata a Skimmer (Standard calcestruzzo/pannelli)</option>
-                    <option value="sfioratore">Interrata a Bordo Sfioratore (Mirror)</option>
-                    <option value="vetroresina">Monoblocco in Vetroresina (Preformata)</option>
-                    <option value="fuoriterra">Fuori Terra / Seminterrata Rinforzata</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Lunghezza Vasca (m)</label>
-                <input type="number" id="poolL" value="8" step="0.5" oninput="onManualChange()">
-            </div>
-            <div class="input-group">
-                <label>Larghezza Vasca (m)</label>
-                <input type="number" id="poolW" value="4" step="0.5" oninput="onManualChange()">
-            </div>
-            <div class="input-group">
-                <label>Profondità Media (m)</label>
-                <input type="number" id="poolH" value="1.4" step="0.1" oninput="updateAll()">
-            </div>
-            <div class="input-group">
-                <label>Tempo di Ricircolo (UNI 10637)</label>
-                <select id="turnoverTime" onchange="updateAll()">
-                    <option value="4">4 Ore (Pubbliche / Natatorie)</option>
-                    <option value="6" selected>6 Ore (Residenziali Standard)</option>
-                    <option value="8">8 Ore (Eco / Risparmio Energetico)</option>
-                </select>
-            </div>
-            
-            <div class="results" id="hydraulicResults">
-                <p>Volume Acqua: -- m³</p>
-                <p>Portata Richiesta: -- m³/h</p>
-                <p>Velocità Tubazione: -- m/s</p>
-            </div>
-        </div>
+            <div class="input-group">
+                <label>Tipologia Piscina</label>
+                <select id="poolType" onchange="onManualChange()">
+                    <option value="skimmer">Interrata a Skimmer (Standard calcestruzzo/pannelli)</option>
+                    <option value="sfioratore">Interrata a Bordo Sfioratore (Mirror)</option>
+                    <option value="vetroresina">Monoblocco in Vetroresina (Preformata)</option>
+                    <option value="fuoriterra">Fuori Terra / Seminterrata Rinforzata</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Lunghezza Vasca (m)</label>
+                <input type="number" id="poolL" value="8" step="0.5" oninput="onManualChange()">
+            </div>
+            <div class="input-group">
+                <label>Larghezza Vasca (m)</label>
+                <input type="number" id="poolW" value="4" step="0.5" oninput="onManualChange()">
+            </div>
+            <div class="input-group">
+                <label>Profondità Media (m)</label>
+                <input type="number" id="poolH" value="1.4" step="0.1" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>Tempo di Ricircolo (UNI 10637)</label>
+                <select id="turnoverTime" onchange="updateAll()">
+                    <option value="4">4 Ore (Pubbliche / Natatorie)</option>
+                    <option value="6" selected>6 Ore (Residenziali Standard)</option>
+                    <option value="8">8 Ore (Eco / Risparmio Energetico)</option>
+                </select>
+            </div>
+            
+            <div class="results" id="hydraulicResults">
+                <p>Volume Acqua: -- m³</p>
+                <p>Portata Richiesta: -- m³/h</p>
+                <p>Velocità Tubazione: -- m/s</p>
+            </div>
+        </div>
 
-        <!-- 2. ANTEPRIMA 3D -->
-        <div class="card">
-            <h2>2. Anteprima 3D Interattiva</h2>
-            <div id="canvas-container"></div>
-            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con viewport forzato</p>
-        </div>
+        <!-- 2. ANTEPRIMA 3D -->
+        <div class="card">
+            <h2>2. Anteprima 3D Interattiva</h2>
+            <div id="canvas-container"></div>
+            <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 8px; font-weight: bold;">Rendering 3D con viewport forzato</p>
+        </div>
 
-        <!-- 3. PREVENTIVO, IVA E DISTINTA BASE -->
-        <div class="card">
-            <h2>3. Preventivo, IVA & Distinta Base</h2>
-            
-            <div class="input-group">
-                <label>Rivestimento / Membrana (Renolit Italia)</label>
-                <select id="liningModel" onchange="updateAll()">
-                    <option value="1000">Renolit Alkorplan 1000 (Tinta Unita 1,5 mm)</option>
-                    <option value="2000">Renolit Alkorplan 2000 (Laccato 1,5 mm)</option>
-                    <option value="touch" selected>Renolit Alkorplan Touch (Effetto Pietra 2 mm)</option>
-                    <option value="evolve">Renolit Alkorplan Ceramics Evolve (Effetto Ceramica)</option>
-                </select>
-            </div>
+        <!-- 3. PREVENTIVO, IVA E DISTINTA BASE -->
+        <div class="card">
+            <h2>3. Preventivo, IVA & Distinta Base</h2>
+            
+            <div class="input-group">
+                <label>Rivestimento / Membrana (Renolit Italia)</label>
+                <select id="liningModel" onchange="updateAll()">
+                    <option value="1000">Renolit Alkorplan 1000 (Tinta Unita 1,5 mm)</option>
+                    <option value="2000">Renolit Alkorplan 2000 (Laccato 1,5 mm)</option>
+                    <option value="touch" selected>Renolit Alkorplan Touch (Effetto Pietra 2 mm)</option>
+                    <option value="evolve">Renolit Alkorplan Ceramics Evolve (Effetto Ceramica)</option>
+                </select>
+            </div>
 
-            <div class="input-group">
-                <label>Pavimentazione Perimetrale / Solarium (mq) [Modificabile]</label>
-                <input type="number" id="solariumArea" value="50" step="1" oninput="updateAll()">
-            </div>
+            <div class="input-group">
+                <label>Pavimentazione Perimetrale / Solarium (mq) [Modificabile]</label>
+                <input type="number" id="solariumArea" value="50" step="1" oninput="updateAll()">
+            </div>
 
-            <div class="input-group">
-                <label>Doccia Solare da Esterno</label>
-                <select id="solarShower" onchange="updateAll()">
-                    <option value="none">Nessuna Doccia Solare</option>
-                    <option value="standard" selected>Doccia Solare in Alluminio con Miscelatore</option>
-                    <option value="luxury">Doccia Solare di Design Curva con Lava-piedi</option>
-                </select>
-            </div>
+            <div class="input-group">
+                <label>Doccia Solare da Esterno</label>
+                <select id="solarShower" onchange="updateAll()">
+                    <option value="none">Nessuna Doccia Solare</option>
+                    <option value="standard" selected>Doccia Solare in Alluminio con Miscelatore</option>
+                    <option value="luxury">Doccia Solare di Design Curva con Lava-piedi</option>
+                </select>
+            </div>
 
-            <div class="input-group">
-                <label>Pompa di Calore Inverter (Riscaldamento Acqua)</label>
-                <select id="heatPump" onchange="updateAll()">
-                    <option value="none">Nessuna Pompa di Calore</option>
-                    <option value="inverter_std" selected>Pompa di Calore Inverter Full-Inverter (Eco)</option>
-                    <option value="inverter_pro">Pompa di Calore Inverter Alta Efficienza (Clima rigido)</option>
-                </select>
-            </div>
+            <div class="input-group">
+                <label>Pompa di Calore Inverter (Riscaldamento Acqua)</label>
+                <select id="heatPump" onchange="updateAll()">
+                    <option value="none">Nessuna Pompa di Calore</option>
+                    <option value="inverter_std" selected>Pompa di Calore Inverter Full-Inverter (Eco)</option>
+                    <option value="inverter_pro">Pompa di Calore Inverter Alta Efficienza (Clima rigido)</option>
+                </select>
+            </div>
 
-            <div class="input-group">
-                <label>Copertura Piscina (Isotermica / Sicurezza)</label>
-                <select id="poolCover" onchange="updateAll()">
-                    <option value="none">Nessuna Copertura</option>
-                    <option value="bubble" selected>Copertura Isotermica a Bolle 400 micron</option>
-                    <option value="automatic">Copertura a Tapparella Automatica Fuoriterra</option>
-                </select>
-            </div>
+            <div class="input-group">
+                <label>Copertura Piscina (Isotermica / Sicurezza)</label>
+                <select id="poolCover" onchange="updateAll()">
+                    <option value="none">Nessuna Copertura</option>
+                    <option value="bubble" selected>Copertura Isotermica a Bolle 400 micron</option>
+                    <option value="automatic">Copertura a Tapparella Automatica Fuoriterra</option>
+                </select>
+            </div>
 
-            <div class="input-group">
-                <label>Ricarico Materiali (%) [Listino Partner]</label>
-                <input type="number" id="materialMarkup" value="35" step="1" oninput="updateAll()">
-            </div>
-            <div class="input-group">
-                <label>Incidenza Manodopera & Scavi (%)</label>
-                <input type="number" id="laborMarkup" value="40" step="1" oninput="updateAll()">
-            </div>
-            <div class="input-group">
-                <label>Margine d'Impresa / Utile (%)</label>
-                <input type="number" id="companyMargin" value="18" step="1" oninput="updateAll()">
-            </div>
+            <div class="input-group">
+                <label>Ricarico Materiali (%) [Listino Partner]</label>
+                <input type="number" id="materialMarkup" value="35" step="1" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>Incidenza Manodopera & Scavi (%)</label>
+                <input type="number" id="laborMarkup" value="40" step="1" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>Margine d'Impresa / Utile (%)</label>
+                <input type="number" id="companyMargin" value="18" step="1" oninput="updateAll()">
+            </div>
 
-            <div class="input-group" style="margin-bottom: 10px;">
-                <label>Aliquota IVA Applicata</label>
-                <select id="vatRate" onchange="updateAll()">
-                    <option value="0.22" selected>IVA Ordinaria 22%</option>
-                    <option value="0.10">IVA Agevolata 10% (Ristrutturazioni / Prima Casa)</option>
-                    <option value="0.00">Esente / Non Soggetta (0%)</option>
-                </select>
-            </div>
+            <div class="input-group" style="margin-bottom: 10px;">
+                <label>Aliquota IVA Applicata</label>
+                <select id="vatRate" onchange="updateAll()">
+                    <option value="0.22" selected>IVA Ordinaria 22%</option>
+                    <option value="0.10">IVA Agevolata 10% (Ristrutturazioni / Prima Casa)</option>
+                    <option value="0.00">Esente / Non Soggetta (0%)</option>
+                </select>
+            </div>
 
-            <!-- Distinta Base in elenco -->
-            <div class="bom-container">
-                <p style="color: #38bdf8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Distinta Base Componenti:</p>
-                <ul class="bom-list" id="bomListContainer">
-                    <!-- Popolato dinamicamente -->
-                </ul>
-            </div>
+            <!-- Distinta Base in elenco -->
+            <div class="bom-container">
+                <p style="color: #38bdf8; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Distinta Base Componenti:</p>
+                <ul class="bom-list" id="bomListContainer">
+                    <!-- Popolato dinamicamente -->
+                </ul>
+            </div>
 
-            <div class="total-box" id="totalBoxContent">
-                Totale Imponibile: € 0,00<br>
-                IVA: € 0,00<br>
-                <strong>Totale Complessivo IVA Inclusa: <span>€ 0,00</span></strong>
-            </div>
+            <div class="total-box" id="totalBoxContent">
+                Totale Imponibile: € 0,00<br>
+                IVA: € 0,00<br>
+                <strong>Totale Complessivo IVA Inclusa: <span>€ 0,00</span></strong>
+            </div>
 
-            <button class="action-btn" onclick="generateOrder()">Genera Preventivo Ufficiale in PDF</button>
-        </div>
-    </div>
+            <button class="action-btn" onclick="generateOrder()">Genera Preventivo Ufficiale in PDF</button>
+        </div>
+    </div>
 
-    <script>
-        let scene, camera, renderer, poolGroup;
+    <script>
+        let scene, camera, renderer, poolGroup;
 
-        const catalogModels = {
-            'fluidra_8x4': { l: 8, w: 4, h: 1.4, type: 'skimmer' },
-            'liberty_6x3': { l: 6, w: 3, h: 1.3, type: 'vetroresina' },
-            'lagos_5x3': { l: 5, w: 3, h: 1.2, type: 'fuoriterra' },
-            'mirror_10x5': { l: 10, w: 5, h: 1.5, type: 'sfioratore' }
-        };
+        const catalogModels = {
+            'fluidra_8x4': { l: 8, w: 4, h: 1.4, type: 'skimmer' },
+            'liberty_6x3': { l: 6, w: 3, h: 1.3, type: 'vetroresina' },
+            'lagos_5x3': { l: 5, w: 3, h: 1.2, type: 'fuoriterra' },
+            'mirror_10x5': { l: 10, w: 5, h: 1.5, type: 'sfioratore' }
+        };
 
-        function applyCatalogModel() {
-            const val = document.getElementById('catalogModel').value;
-            if (val === 'custom') return;
-            const model = catalogModels[val];
-            if (model) {
-                document.getElementById('poolL').value = model.l;
-                document.getElementById('poolW').value = model.w;
-                document.getElementById('poolH').value = model.h;
-                document.getElementById('poolType').value = model.type;
-                onDimensionsChange();
-            }
-        }
+        function applyCatalogModel() {
+            const val = document.getElementById('catalogModel').value;
+            if (val === 'custom') return;
+            const model = catalogModels[val];
+            if (model) {
+                document.getElementById('poolL').value = model.l;
+                document.getElementById('poolW').value = model.w;
+                document.getElementById('poolH').value = model.h;
+                document.getElementById('poolType').value = model.type;
+                onDimensionsChange();
+            }
+        }
 
-        function onManualChange() {
-            document.getElementById('catalogModel').value = 'custom';
-            onDimensionsChange();
-        }
+        function onManualChange() {
+            document.getElementById('catalogModel').value = 'custom';
+            onDimensionsChange();
+        }
 
-        function init3D() {
-            const container = document.getElementById('canvas-container');
-            if (!container) return;
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            if (!container) return;
 
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x020617);
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x020617);
 
-            const width = container.clientWidth || 350;
-            const height = container.clientHeight || 300;
+            const width = container.clientWidth || 350;
+            const height = container.clientHeight || 300;
 
-            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-            renderer.setSize(width, height);
-            renderer.setPixelRatio(window.devicePixelRatio || 1);
-            
-            container.innerHTML = '';
-            container.appendChild(renderer.domElement);
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio || 1);
+            
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-            scene.add(ambientLight);
-            
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
-            dirLight.position.set(15, 30, 20);
-            scene.add(dirLight);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+            scene.add(ambientLight);
+            
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            dirLight.position.set(15, 30, 20);
+            scene.add(dirLight);
 
-            poolGroup = new THREE.Group();
-            scene.add(poolGroup);
+            poolGroup = new THREE.Group();
+            scene.add(poolGroup);
 
-            const initialL = parseFloat(document.getElementById('poolL').value) || 8;
-            const initialW = parseFloat(document.getElementById('poolW').value) || 4;
-            const initialH = parseFloat(document.getElementById('poolH').value) || 1.4;
-            
-            createPoolMeshes(initialL, initialW, initialH, document.getElementById('poolType').value);
+            const initialL = parseFloat(document.getElementById('poolL').value) || 8;
+            const initialW = parseFloat(document.getElementById('poolW').value) || 4;
+            const initialH = parseFloat(document.getElementById('poolH').value) || 1.4;
+            
+            createPoolMeshes(initialL, initialW, initialH, document.getElementById('poolType').value);
 
-            camera.position.set(12, 10, 14);
-            camera.lookAt(0, 0, 0);
+            camera.position.set(12, 10, 14);
+            camera.lookAt(0, 0, 0);
 
-            animate();
-        }
+            animate();
+        }
 
-        function createPoolMeshes(l, w, h, type) {
-            if (!poolGroup) return;
-            
-            while(poolGroup.children.length > 0){ 
-                poolGroup.remove(poolGroup.children[0]); 
-            }
+        function createPoolMeshes(l, w, h, type) {
+            if (!poolGroup) return;
+            
+            while(poolGroup.children.length > 0){ 
+                poolGroup.remove(poolGroup.children[0]); 
+            }
 
-            const scaleFactor = 0.55;
-            const geomL = Math.max(2, l * scaleFactor);
-            const geomW = Math.max(1.5, w * scaleFactor);
-            const geomH = Math.max(0.8, h * scaleFactor);
+            const scaleFactor = 0.55;
+            const geomL = Math.max(2, l * scaleFactor);
+            const geomW = Math.max(1.5, w * scaleFactor);
+            const geomH = Math.max(0.8, h * scaleFactor);
 
-            let poolColor = 0x334155; 
-            if (type === 'vetroresina') poolColor = 0xe2e8f0; 
-            if (type === 'fuoriterra') poolColor = 0xb45309; 
+            let poolColor = 0x334155; 
+            if (type === 'vetroresina') poolColor = 0xe2e8f0; 
+            if (type === 'fuoriterra') poolColor = 0xb45309; 
 
-            const poolGeo = new THREE.BoxGeometry(geomL, geomH, geomW);
-            const poolMat = new THREE.MeshStandardMaterial({ color: poolColor, roughness: 0.4, metalness: 0.1 });
-            const poolMesh = new THREE.Mesh(poolGeo, poolMat);
-            poolMesh.position.y = geomH / 2;
-            poolGroup.add(poolMesh);
+            const poolGeo = new THREE.BoxGeometry(geomL, geomH, geomW);
+            const poolMat = new THREE.MeshStandardMaterial({ color: poolColor, roughness: 0.4, metalness: 0.1 });
+            const poolMesh = new THREE.Mesh(poolGeo, poolMat);
+            poolMesh.position.y = geomH / 2;
+            poolGroup.add(poolMesh);
 
-            const waterGeo = new THREE.BoxGeometry(geomL - 0.2, geomH - 0.25, geomW - 0.2);
-            const waterMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.8, roughness: 0.1 });
-            const waterMesh = new THREE.Mesh(waterGeo, waterMat);
-            waterMesh.position.y = (geomH / 2) + 0.02;
-            poolGroup.add(waterMesh);
+            const waterGeo = new THREE.BoxGeometry(geomL - 0.2, geomH - 0.25, geomW - 0.2);
+            const waterMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, transparent: true, opacity: 0.8, roughness: 0.1 });
+            const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+            waterMesh.position.y = (geomH / 2) + 0.02;
+            poolGroup.add(waterMesh);
 
-            const copingGeo = new THREE.BoxGeometry(geomL + 0.3, 0.1, geomW + 0.3);
-            const copingMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2 });
-            const copingMesh = new THREE.Mesh(copingGeo, copingMat);
-            copingMesh.position.y = geomH + 0.05;
-            poolGroup.add(copingMesh);
+            const copingGeo = new THREE.BoxGeometry(geomL + 0.3, 0.1, geomW + 0.3);
+            const copingMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2 });
+            const copingMesh = new THREE.Mesh(copingGeo, copingMat);
+            copingMesh.position.y = geomH + 0.05;
+            poolGroup.add(copingMesh);
 
-            if (type !== 'sfioratore') {
-                const skimmerGeo = new THREE.BoxGeometry(0.3, 0.15, 0.1);
-                const skimmerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-                const skimmer1 = new THREE.Mesh(skimmerGeo, skimmerMat);
-                skimmer1.position.set(0, geomH - 0.1, (geomW / 2) + 0.12);
-                poolGroup.add(skimmer1);
-            }
-        }
+            if (type !== 'sfioratore') {
+                const skimmerGeo = new THREE.BoxGeometry(0.3, 0.15, 0.1);
+                const skimmerMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+                const skimmer1 = new THREE.Mesh(skimmerGeo, skimmerMat);
+                skimmer1.position.set(0, geomH - 0.1, (geomW / 2) + 0.12);
+                poolGroup.add(skimmer1);
+            }
+        }
 
-        function update3DGeometry(l, w, h, type) {
-            if (scene && poolGroup) {
-                createPoolMeshes(l, w, h, type);
-            }
-        }
+        function update3DGeometry(l, w, h, type) {
+            if (scene && poolGroup) {
+                createPoolMeshes(l, w, h, type);
+            }
+        }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            if (poolGroup) {
-                poolGroup.rotation.y += 0.002;
-            }
-            if (renderer && scene && camera) {
-                renderer.render(scene, camera);
-            }
-        }
+        function animate() {
+            requestAnimationFrame(animate);
+            if (poolGroup) {
+                poolGroup.rotation.y += 0.002;
+            }
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
 
-        function onDimensionsChange() {
-            const l = parseFloat(document.getElementById('poolL').value) || 0;
-            const w = parseFloat(document.getElementById('poolW').value) || 0;
-            const autoSolarium = Math.round((l + 3) * (w + 3) - (l * w));
-            document.getElementById('solariumArea').value = autoSolarium;
-            updateAll();
-        }
+        function onDimensionsChange() {
+            const l = parseFloat(document.getElementById('poolL').value) || 0;
+            const w = parseFloat(document.getElementById('poolW').value) || 0;
+            const autoSolarium = Math.round((l + 3) * (w + 3) - (l * w));
+            document.getElementById('solariumArea').value = autoSolarium;
+            updateAll();
+        }
 
-        function generateComponentList(l, w, h, flowRate, type, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumCost, showerCost, heatPumpCost, coverCost) {
-            const surfaceArea = (l * w) + (2 * (l + w) * h);
-            const skimmerCount = l > 10 ? 3 : 2;
-            const bQuantity = l > 10 ? 6 : 4;
-            const fQuantity = l > 10 ? 3 : 2;
-            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
+        function generateComponentList(l, w, h, flowRate, type, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumCost, showerCost, heatPumpCost, coverCost) {
+            const surfaceArea = (l * w) + (2 * (l + w) * h);
+            const skimmerCount = l > 10 ? 3 : 2;
+            const bQuantity = l > 10 ? 6 : 4;
+            const fQuantity = l > 10 ? 3 : 2;
+            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
 
-            let html = `
-                <li><span>Movimento Terra & Struttura Armata</span> <span>€ ${(rawMaterials * 0.35 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Rivestimento Membrana (~${surfaceArea.toFixed(0)} m²)</span> <span>€ ${(rawMaterials * 0.18 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Filtrazione (${flowRate.toFixed(1)} m³/h) & Pompa Fluidra</span> <span>€ ${(rawMaterials * 0.20 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Skimmer (${skimmerCount} pz) & Bocchette (${bQuantity} pz)</span> <span>€ ${(rawMaterials * 0.12 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Quadro Elettrico Puls & ${fQuantity} Fari LED</span> <span>€ ${(rawMaterials * 0.15 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Pavimentazione Solare (${solariumMq} mq)</span> <span>€ ${solariumCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Doccia Solare da Esterno</span> <span>€ ${showerCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-            `;
+            let html = `
+                <li><span>Movimento Terra & Struttura Armata</span> <span>€ ${(rawMaterials * 0.35 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Rivestimento Membrana (~${surfaceArea.toFixed(0)} m²)</span> <span>€ ${(rawMaterials * 0.18 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Filtrazione (${flowRate.toFixed(1)} m³/h) & Pompa Fluidra</span> <span>€ ${(rawMaterials * 0.20 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Skimmer (${skimmerCount} pz) & Bocchette (${bQuantity} pz)</span> <span>€ ${(rawMaterials * 0.12 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Quadro Elettrico Puls & ${fQuantity} Fari LED</span> <span>€ ${(rawMaterials * 0.15 * (1 + (pricedMaterials/rawMaterials - 1))).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Pavimentazione Solare (${solariumMq} mq)</span> <span>€ ${solariumCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Doccia Solare da Esterno</span> <span>€ ${showerCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+            `;
 
-            if (heatPumpCost > 0) {
-                html += `<li><span>Pompa di Calore Inverter</span> <span>€ ${heatPumpCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>`;
-            }
-            if (coverCost > 0) {
-                html += `<li><span>Copertura Piscina</span> <span>€ ${coverCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>`;
-            }
+            if (heatPumpCost > 0) {
+                html += `<li><span>Pompa di Calore Inverter</span> <span>€ ${heatPumpCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>`;
+            }
+            if (coverCost > 0) {
+                html += `<li><span>Copertura Piscina</span> <span>€ ${coverCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>`;
+            }
 
-            html += `
-                <li><span>Manodopera Specializzata & Scavi</span> <span>€ ${laborCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-                <li><span>Margine d'Impresa / Utile</span> <span>€ ${(subtotal * compMargin).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
-            `;
-            
-            document.getElementById('bomListContainer').innerHTML = html;
-        }
+            html += `
+                <li><span>Manodopera Specializzata & Scavi</span> <span>€ ${laborCost.toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+                <li><span>Margine d'Impresa / Utile</span> <span>€ ${(subtotal * compMargin).toLocaleString('it-IT', {maximumFractionDigits:0})}</span></li>
+            `;
+            
+            document.getElementById('bomListContainer').innerHTML = html;
+        }
 
-        function updateAll() {
-            const l = parseFloat(document.getElementById('poolL').value) || 0;
-            const w = parseFloat(document.getElementById('poolW').value) || 0;
-            const h = parseFloat(document.getElementById('poolH').value) || 0;
-            const t = parseFloat(document.getElementById('turnoverTime').value) || 6;
-            const pType = document.getElementById('poolType').value;
-            
-            const matMarkup = parseFloat(document.getElementById('materialMarkup').value) / 100 || 0;
-            const labMarkup = parseFloat(document.getElementById('laborMarkup').value) / 100 || 0;
-            const compMargin = parseFloat(document.getElementById('companyMargin').value) / 100 || 0;
-            const vatPercentage = parseFloat(document.getElementById('vatRate').value) || 0;
+        function updateAll() {
+            const l = parseFloat(document.getElementById('poolL').value) || 0;
+            const w = parseFloat(document.getElementById('poolW').value) || 0;
+            const h = parseFloat(document.getElementById('poolH').value) || 0;
+            const t = parseFloat(document.getElementById('turnoverTime').value) || 6;
+            const pType = document.getElementById('poolType').value;
+            
+            const matMarkup = parseFloat(document.getElementById('materialMarkup').value) / 100 || 0;
+            const labMarkup = parseFloat(document.getElementById('laborMarkup').value) / 100 || 0;
+            const compMargin = parseFloat(document.getElementById('companyMargin').value) / 100 || 0;
+            const vatPercentage = parseFloat(document.getElementById('vatRate').value) || 0;
 
-            const volume = l * w * h;
-            const flowRate = volume / t;
-            const area = Math.PI * Math.pow(0.027, 2); 
-            const velocity = (flowRate / 3600) / area;
+            const volume = l * w * h;
+            const flowRate = volume / t;
+            const area = Math.PI * Math.pow(0.027, 2); 
+            const velocity = (flowRate / 3600) / area;
 
-            document.getElementById('hydraulicResults').innerHTML = `
-                <p><strong>Volume Acqua:</strong> ${volume.toFixed(2)} m³</p>
-                <p><strong>Portata Richiesta:</strong> ${flowRate.toFixed(2)} m³/h</p>
-                <p><strong>Velocità Tubazione (DN63):</strong> ${velocity.toFixed(2)} m/s (Ottimale &lt; 1.5 m/s)</p>
-            `;
+            document.getElementById('hydraulicResults').innerHTML = `
+                <p><strong>Volume Acqua:</strong> ${volume.toFixed(2)} m³</p>
+                <p><strong>Portata Richiesta:</strong> ${flowRate.toFixed(2)} m³/h</p>
+                <p><strong>Velocità Tubazione (DN63):</strong> ${velocity.toFixed(2)} m/s (Ottimale &lt; 1.5 m/s)</p>
+            `;
 
-            let baseMaterialCostPerSqm = 140;
-            if (pType === 'sfioratore') baseMaterialCostPerSqm = 185;
-            if (pType === 'vetroresina') baseMaterialCostPerSqm = 160;
-            if (pType === 'fuoriterra') baseMaterialCostPerSqm = 110;
+            let baseMaterialCostPerSqm = 140;
+            if (pType === 'sfioratore') baseMaterialCostPerSqm = 185;
+            if (pType === 'vetroresina') baseMaterialCostPerSqm = 160;
+            if (pType === 'fuoriterra') baseMaterialCostPerSqm = 110;
 
-            const surfaceArea = (l * w) + (2 * (l + w) * h);
-            const rawMaterials = surfaceArea * baseMaterialCostPerSqm;
-            
-            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
-            const solariumBaseCost = solariumMq * 55;
-            const solariumTotalPriced = solariumBaseCost * (1 + matMarkup);
+            const surfaceArea = (l * w) + (2 * (l + w) * h);
+            const rawMaterials = surfaceArea * baseMaterialCostPerSqm;
+            
+            const solariumMq = parseFloat(document.getElementById('solariumArea').value) || 0;
+            const solariumBaseCost = solariumMq * 55;
+            const solariumTotalPriced = solariumBaseCost * (1 + matMarkup);
 
-            const showerType = document.getElementById('solarShower').value;
-            let showerBaseCost = 0;
-            if (showerType === 'standard') showerBaseCost = 450;
-            if (showerType === 'luxury') showerBaseCost = 850;
-            const showerTotalPriced = showerBaseCost * (1 + matMarkup);
+            const showerType = document.getElementById('solarShower').value;
+            let showerBaseCost = 0;
+            if (showerType === 'standard') showerBaseCost = 450;
+            if (showerType === 'luxury') showerBaseCost = 850;
+            const showerTotalPriced = showerBaseCost * (1 + matMarkup);
 
-            const hpType = document.getElementById('heatPump').value;
-            let hpBaseCost = 0;
-            if (hpType === 'inverter_std') hpBaseCost = 1800;
-            if (hpType === 'inverter_pro') hpBaseCost = 2800;
-            const hpTotalPriced = hpBaseCost * (1 + matMarkup);
+            const hpType = document.getElementById('heatPump').value;
+            let hpBaseCost = 0;
+            if (hpType === 'inverter_std') hpBaseCost = 1800;
+            if (hpType === 'inverter_pro') hpBaseCost = 2800;
+            const hpTotalPriced = hpBaseCost * (1 + matMarkup);
 
-            const coverType = document.getElementById('poolCover').value;
-            let coverBaseCost = 0;
-            if (coverType === 'bubble') coverBaseCost = 650;
-            if (coverType === 'automatic') coverBaseCost = 4500;
-            const coverTotalPriced = coverBaseCost * (1 + matMarkup);
+            const coverType = document.getElementById('poolCover').value;
+            let coverBaseCost = 0;
+            if (coverType === 'bubble') coverBaseCost = 650;
+            if (coverType === 'automatic') coverBaseCost = 4500;
+            const coverTotalPriced = coverBaseCost * (1 + matMarkup);
 
-            const pricedMaterials = (rawMaterials * (1 + matMarkup)) + solariumTotalPriced + showerTotalPriced + hpTotalPriced + coverTotalPriced;
-            const laborCost = pricedMaterials * labMarkup;
-            const subtotal = pricedMaterials + laborCost;
-            const finalSubtotal = subtotal * (1 + compMargin);
+            const pricedMaterials = (rawMaterials * (1 + matMarkup)) + solariumTotalPriced + showerTotalPriced + hpTotalPriced + coverTotalPriced;
+            const laborCost = pricedMaterials * labMarkup;
+            const subtotal = pricedMaterials + laborCost;
+            const finalSubtotal = subtotal * (1 + compMargin);
 
-            const vatAmount = finalSubtotal * vatPercentage;
-            const finalTotalWithVat = finalSubtotal + vatAmount;
+            const vatAmount = finalSubtotal * vatPercentage;
+            const finalTotalWithVat = finalSubtotal + vatAmount;
 
-            generateComponentList(l, w, h, flowRate, pType, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumTotalPriced, showerTotalPriced, hpTotalPriced, coverTotalPriced);
+            generateComponentList(l, w, h, flowRate, pType, rawMaterials, pricedMaterials, laborCost, compMargin, subtotal, solariumTotalPriced, showerTotalPriced, hpTotalPriced, coverTotalPriced);
 
-            document.getElementById('totalBoxContent').innerHTML = `
-                Totale Imponibile: € ${finalSubtotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
-                IVA (${(vatPercentage * 100).toFixed(0)}%): € ${vatAmount.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
-                <strong>Totale Complessivo IVA Inclusa: <span>€ ${finalTotalWithVat.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></strong>
-            `;
+            document.getElementById('totalBoxContent').innerHTML = `
+                Totale Imponibile: € ${finalSubtotal.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
+                IVA (${(vatPercentage * 100).toFixed(0)}%): € ${vatAmount.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}<br>
+                <strong>Totale Complessivo IVA Inclusa: <span>€ ${finalTotalWithVat.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></strong>
+            `;
 
-            update3DGeometry(l, w, h, pType);
-        }
+            update3DGeometry(l, w, h, pType);
+        }
 
-        function generateOrder() {
-            alert("Preventivo ufficiale completo di logo, IVA e distinta base generato con successo!");
-        }
+        function generateOrder() {
+            alert("Preventivo ufficiale completo di logo, IVA e distinta base generato con successo!");
+        }
 
-        window.onload = function() {
-            init3D();
-            applyCatalogModel(); 
-        };
+        window.onload = function() {
+            init3D();
+            applyCatalogModel(); 
+        };
 
-        window.onresize = function() {
-            const container = document.getElementById('canvas-container');
-            if (container && renderer && camera) {
-                const width = container.clientWidth;
-                const height = container.clientHeight;
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-                renderer.setSize(width, height);
-            }
-        };
-    </script>
+        window.onresize = function() {
+            const container = document.getElementById('canvas-container');
+            if (container && renderer && camera) {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+            }
+        };
+    </script>
 </body>
 </html>
